@@ -4,10 +4,13 @@
         public $ime;
         public $adresa;
         public $stolovi = [];
+        public $konobari = [];
+        public $porudzbine = [];
 
         public function __construct($ime, $adresa) {
             $this->ime = $ime;
             $this->adresa = $adresa;
+            // kreiranje stolova pri instanciranju objekta
             $this->dodajStolove();
         }
 
@@ -17,16 +20,39 @@
             }
         }
 
+        public function dodajKonobara(Konobar $konobar) {
+            $this->konobari[] = $konobar;
+        }
+
+        public function dodajPorudzbinu($hrana, $pice, $prilog) {
+            $this->porudzbine[] = new Porudzbina($hrana, $pice, $prilog);
+        }
+
+        public function ispostaviRacun() {
+            $racun = new Racun();
+            $porudzbina = $this->porudzbine[0];
+            $racun->izracunajCenu($porudzbina);
+            var_dump($racun);
+        }
+
     }
 
     class Konobar {
         public $ime;
         public $jmbg;
-        private $plata;
+        private $plata = '50000';
 
         public function __construct($ime, $jmbg) {
             $this->ime = $ime;
             $this->jmbg = $jmbg;
+        }
+
+        public function getPlata() {
+            return $this->plata;
+        }
+
+        public function setPlata($plata) {
+            $this->plata = $plata;
         }
     }
 
@@ -42,27 +68,28 @@
     class Racun {
         public $iznos;
 
-        public function __construct($iznos) {
-            $this->iznos = $iznos;
+        public function izracunajCenu(Porudzbina $porudzbina) {
+            $this->iznos = $porudzbina->hrana->cena + 
+                           $porudzbina->pice->cena +    
+                           $porudzbina->prilog->cena;
         }
-
-        public function izracunajCenu() {}
     }
 
     class Porudzbina {
-        public $obrok = [];
-
         public $hrana;
         public $pice;
         public $prilog;
 
-        public function __construct($hrana, $pice, $prilog) {
+        public function __construct(Hrana $hrana, Pice $pice, Prilog $prilog) {
             $this->hrana = $hrana;
             $this->pice = $pice;
             $this->prilog = $prilog;
         }
 
-        public function dodajObrok() {}
+        public function dodajObrok() {
+            $obrok = new Porudzbina($this->hrana, $this->pice, $this->prilog);
+            $this->obrok[] = $obrok; 
+        }
 
     }
 
@@ -109,10 +136,18 @@
     }
 
 
-    // $mario = new Restoran('Mario\'s', 'Brace Krkljus 3');
-    // var_dump($mario);
+    $mario = new Restoran('Mario\'s', 'Brace Krkljus 3');
 
-    // $porudzbina = new Porudzbina('pica', 'voda', 'ananas');
-    // var_dump($porudzbina);
+    $mile = new Konobar('Mile', '0992873380001');
+    $mario->dodajKonobara($mile);
 
-?>
+    $klopa = new Pizza('Margarita');
+    $pice = new GaziraniSokovi('Koka-Kola', '0.25');
+    $prilog = new Prilog('majonez');
+    $mario->dodajPorudzbinu($klopa, $pice, $prilog);
+    // $mario->dodajPorudzbinu('pica', 'kola', 'majonez');
+    $mario->ispostaviRacun();
+    var_dump($mario);
+
+
+?>  
