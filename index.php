@@ -32,7 +32,7 @@
             $racun = new Racun();
             $porudzbina = $this->porudzbine[0];
             $racun->izracunajCenu($porudzbina);
-            var_dump($racun);
+            // var_dump($racun);
         }
 
     }
@@ -85,12 +85,6 @@
             $this->pice = $pice;
             $this->prilog = $prilog;
         }
-
-        public function dodajObrok() {
-            $obrok = new Porudzbina($this->hrana, $this->pice, $this->prilog);
-            $this->obrok[] = $obrok; 
-        }
-
     }
 
     abstract class Obrok {
