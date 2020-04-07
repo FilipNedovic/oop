@@ -24,16 +24,21 @@
             $this->konobari[] = $konobar;
         }
 
-        public function dodajPorudzbinu($hrana, $pice, $prilog) {
-            $this->porudzbine[] = new Porudzbina($hrana, $pice, $prilog);
+        public function dodajPorudzbinu(Array $porudzbina) {
+            $novaPorudzbina = new Porudzbina();
+            $novaPorudzbina->dodajObrok($porudzbina);
+
+            $this->porudzbine[] = $novaPorudzbina->obrok;
         }
 
         public function ispostaviRacun() {
             $racun = new Racun();
-            $porudzbina = $this->porudzbine[0];
-            $racun->izracunajCenu($porudzbina);
-            // var_dump($racun);
+            $porudzbinaZaNaplatu = $this->porudzbine[0];
+            var_dump($porudzbinaZaNaplatu);
+            $racun->izracunajCenu($porudzbinaZaNaplatu);
         }
+
+
 
     }
 
@@ -68,22 +73,25 @@
     class Racun {
         public $iznos;
 
-        public function izracunajCenu(Porudzbina $porudzbina) {
-            $this->iznos = $porudzbina->hrana->cena + 
-                           $porudzbina->pice->cena +    
-                           $porudzbina->prilog->cena;
+        public function izracunajCenu(Array $porudzbina) {           
+            $sum = 0;
+
+            for($i = 0; $i <= count($porudzbina); $i++) {
+                $sum += $porudzbina[$i]->cena;
+            }
+            var_dump($sum);
+            $this->iznos = $sum;
         }
     }
 
     class Porudzbina {
+        public $obrok = [];
         public $hrana;
         public $pice;
         public $prilog;
 
-        public function __construct(Hrana $hrana, Pice $pice, Prilog $prilog) {
-            $this->hrana = $hrana;
-            $this->pice = $pice;
-            $this->prilog = $prilog;
+        public function dodajObrok(Array $obrok) {
+            $this->obrok[] = $obrok;
         }
     }
 
@@ -91,7 +99,9 @@
         public $naziv; 
         public $cena;
 
-        public function __construct() {}
+        public function __construct($naziv) {
+            $this->naziv = $naziv;
+        }
 
     }
 
@@ -138,10 +148,8 @@
     $klopa = new Pizza('Margarita');
     $pice = new GaziraniSokovi('Koka-Kola', '0.25');
     $prilog = new Prilog('majonez');
-    $mario->dodajPorudzbinu($klopa, $pice, $prilog);
-    // $mario->dodajPorudzbinu('pica', 'kola', 'majonez');
+    $mario->dodajPorudzbinu([$klopa, $pice, $prilog]);
     $mario->ispostaviRacun();
     var_dump($mario);
-
 
 ?>  
