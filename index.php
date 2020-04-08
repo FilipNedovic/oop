@@ -3,9 +3,11 @@
     class Restoran {
         public $ime;
         public $adresa;
+
         public $stolovi = [];
         public $konobari = [];
         public $porudzbine = [];
+        public $neplacenePorudzbine = [];
 
         public function __construct($ime, $adresa) {
             $this->ime = $ime;
@@ -15,7 +17,7 @@
         }
 
         public function dodajStolove() {
-            for($i = 0; $i < 10; $i++) {
+            for($i = 1; $i <= 4; $i++) {
                 $this->stolovi[] = new Sto();
             }
         }
@@ -31,15 +33,25 @@
             $this->porudzbine[] = $novaPorudzbina->obrok;
         }
 
-        public function ispostaviRacun() {
-            $racun = new Racun();
-            $porudzbinaZaNaplatu = $this->porudzbine[0];
-            var_dump($porudzbinaZaNaplatu);
-            $racun->izracunajCenu($porudzbinaZaNaplatu);
+        public function naruciObrok(Array $porudzbina) {
+            // zauzmi sto
+            $stoKojiNarucuje = array_shift($this->stolovi);
+
+            // povezi sto sa porudzbinom
+            $this->dodajPorudzbinu($porudzbina);
+            $naruceniObrok = array_shift($this->porudzbine);
+            $stoKojiNarucuje->porudzbinaStola = $naruceniObrok;
+
+            // spremi porudzbinu za naplatu
+            $this->neplacenePorudzbine[] = $naruceniObrok[0];      
         }
 
+        public function ispostaviRacun() {
+            $racun = new Racun();
 
-
+            $porudzbinaZaNaplatu = $this->porudzbine[0];
+            $racun->izracunajCenu($porudzbinaZaNaplatu);
+        }
     }
 
     class Konobar {
@@ -64,22 +76,22 @@
     class Sto {
         public static $brojac = 1;
         public $brojStola;
+        public $porudzbinaStola;
 
         public function __construct() {
-            $this->brojStola = self::$brojac++ . '.';
+            $this->brojStola = self::$brojac++;
         }
     }
 
     class Racun {
         public $iznos;
 
-        public function izracunajCenu(Array $porudzbina) {           
-            $sum = 0;
-
-            for($i = 0; $i <= count($porudzbina); $i++) {
-                $sum += $porudzbina[$i]->cena;
+        public function izracunajCenu(Array $porudzbina) {     
+            $sum = 0;      
+            for($i = 0; $i < count($porudzbina[0]); $i++) {
+                $sum += $porudzbina[0][$i]->cena;
             }
-            var_dump($sum);
+
             $this->iznos = $sum;
         }
     }
@@ -145,11 +157,51 @@
     $mile = new Konobar('Mile', '0992873380001');
     $mario->dodajKonobara($mile);
 
-    $klopa = new Pizza('Margarita');
-    $pice = new GaziraniSokovi('Koka-Kola', '0.25');
-    $prilog = new Prilog('majonez');
-    $mario->dodajPorudzbinu([$klopa, $pice, $prilog]);
-    $mario->ispostaviRacun();
-    var_dump($mario);
+    $pizzMargherita = new Pizza('Margherita');
+    $pizzaCappriciosa = new Pizza('Capricciosa');
+    $pizzaQuattroStagioni = new Pizza('Quattro Stagioni');
+    $pizzaFungi = new Pizza('Fungi');
+
+    $pastaCarbonara = new Pasta('Pasta Carbonara');
+    $pastaItaliana = new Pasta('Pasta Italiana');
+    $pastaGricia = new Pasta('Pasta alla Gricia');
+    $pastaVesuviana = new Pasta('Pasta Vesuviana');
+    $pastaCipolla = new Pasta('Pasta alla Cipolla');
+
+    $kola = new GaziraniSokovi('Koka-Kola', '0.25');
+    $djus = new NegaziraniSokovi('djus', '0.3');
+    $voda = new Voda('voda', '0.25');
+
+    $origano = new Prilog('origano');
+    $kecap = new Prilog('kecap');
+    $sir = new Prilog('sir');
+
+    // $mario->dodajPorudzbinu([$klopa, $pice, $prilog]);
+    // $mario->ispostaviRacun();
+    $mario->naruciObrok([$pizzaCappriciosa, $kola, $kecap]);
+    // var_dump($mario->stolovi);
+    // var_dump($mario);
 
 ?>  
+
+<!-- Simulirati rad ovog sistema na sledeći način:
+1) Kreirati 4 stola numerisana brojevima od 1 do 4.
+2) Kreirati 4 različite pizze, 5 pasti, 3 različita pića i 5 priloga. (imena generisati).
+3) Kreirati tri porudžbine za prethodno kreirane stavke (ugledati se ili iskoristiti primer
+ispod):
+a) Sto broj 1
+i) Pizza Capricciosa + kecap + origano,
+ii) Pasta Italiana + extra cheese,
+iii) 2 x Coca cola 0.5,
+b) Sto broj 2
+i) Pizza Siciliana,
+ii) Pasta Carbonara,
+iii) negazirani sok 0.25
+c) Sto broj 3
+i) 3 x Pizza Capricciosa + 2x kecap
+ii) Gazirani sok 0.3, negazirani sok 0.5, čaša vode
+4) Naplatiti prvu i treću porudžbinu.
+5) Pokušati poručivanje Pizza Capricciosa za sto broj 2 (očekuje se da se baci izuzetak).
+6) Naplatiti drugu porudžbinu
+7) Pokušati poručivanje Pizza Capricciosa za sto broj 2 (očekuje se uspešno kreiranje
+porudžbine bez izuzetka). -->
