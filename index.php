@@ -44,13 +44,17 @@
 
             // spremi porudzbinu za naplatu
             $this->neplacenePorudzbine[] = $naruceniObrok[0];      
+
         }
 
         public function ispostaviRacun() {
             $racun = new Racun();
 
-            $porudzbinaZaNaplatu = $this->porudzbine[0];
+            $porudzbinaZaNaplatu = $this->neplacenePorudzbine;
             $racun->izracunajCenu($porudzbinaZaNaplatu);
+            
+            // racun za naplatu
+            $racun->iznos;
         }
     }
 
@@ -176,9 +180,9 @@
     $kecap = new Prilog('kecap');
     $sir = new Prilog('sir');
 
-    // $mario->dodajPorudzbinu([$klopa, $pice, $prilog]);
-    // $mario->ispostaviRacun();
-    // $mario->naruciObrok([$pizzaCappriciosa, $kola, $kecap]);
+    // $mario->dodajPorudzbinu();
+    $mario->naruciObrok([$pizzaCappriciosa, $kola, $kecap]);
+    $mario->ispostaviRacun();
     // var_dump($mario->stolovi);
     // var_dump($mario);
 
