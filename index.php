@@ -7,7 +7,6 @@
         public $stolovi = [];
         public $konobari = [];
         public $porudzbine = [];
-        public $neplacenePorudzbine = [];
 
         public function __construct($ime, $adresa) {
             $this->ime = $ime;
@@ -26,46 +25,8 @@
             $this->konobari[] = $konobar;
         }
 
-        public function dodajPorudzbinu(Array $porudzbina) {
-            $novaPorudzbina = new Porudzbina();
-            $novaPorudzbina->dodajObrok($porudzbina);
-
-            $this->porudzbine[] = $novaPorudzbina->obrok;
-        }
-
-        public function naruciObrok(Array $porudzbina) {
-            // zauzmi sto
-            $stoKojiNarucuje = array_shift($this->stolovi);
-
-            // povezi sto sa porudzbinom
-            $this->dodajPorudzbinu($porudzbina);
-            $naruceniObrok = array_shift($this->porudzbine);
-            $stoKojiNarucuje->porudzbinaStola = $naruceniObrok;
-
-            // spremi porudzbinu za naplatu
-            $this->neplacenePorudzbine[] = $naruceniObrok[0];      
-
-        }
-
-        public function ispostaviRacun() {
-            $racun = new Racun();
-
-            $porudzbinaZaNaplatu = $this->neplacenePorudzbine;
-            $racun->izracunajCenu($porudzbinaZaNaplatu);
-            
-            // racun za naplatu
-            return $racun->iznos;
-        }
-
-        function platiRacun(int $iznos) {
-            $racunZaNaplatu = $this->ispostaviRacun();
-
-            if($iznos < $racunZaNaplatu) {
-                echo 'Nemate dovoljno novca';
-            } else {
-                array_shift($this->neplacenePorudzbine);
-                echo 'Uspesno ste platili Vas racun';
-            }
+        public function dodajPorudzbinu(Porudzbina $porudzbina) {
+            $this->porudzbine[] = $porudzbina;
         }
     }
 
@@ -101,25 +62,30 @@
     class Racun {
         public $iznos;
 
-        public function izracunajCenu(Array $porudzbina) {     
+        public function izracunajCenu(Porudzbina $porudzbina) {     
             $sum = 0;      
-            for($i = 0; $i < count($porudzbina[0]); $i++) {
-                $sum += $porudzbina[0][$i]->cena * $porudzbina[0][$i]->kolicina;
+            for($i = 0; $i < count($porudzbina->obroci); $i++) {
+                $sum += $porudzbina->obroci[$i]->cena * $porudzbina->obroci[$i]->kolicina;
+                // var_dump($porudzbina->obroci);
             }
 
-            $this->iznos = $sum;
+            echo $this->iznos = $sum;
         }
     }
 
     class Porudzbina {
-        public $obrok = [];
-        public $hrana;
-        public $pice;
-        public $prilog;
+        public $obroci = [];
+        public $obrok;
+        public $placeno = false;
 
-        public function dodajObrok(Array $obrok) {
-            $this->obrok[] = $obrok;
+        public function dodajObrok(Obrok $obrok) {
+            $this->obroci[] = $obrok;
         }
+
+        public function plati() {
+            $this->placeno = true;
+        }
+
     }
 
     abstract class Obrok {
@@ -148,7 +114,7 @@
     class Pice extends Obrok {
         public $zapremina;
 
-        public function __construct($naziv, $kolicina, $zapremina) {
+        public function __construct($naziv, $zapremina, $kolicina) {
             parent::__construct($naziv, $kolicina);
             $this->cena = rand(150, 500);
             $this->zapremina = $zapremina;
@@ -174,30 +140,17 @@
     $mile = new Konobar('Mile', '0992873380001');
     $mario->dodajKonobara($mile);
 
-    $porudzbina1 = [
-        $pizzaCappriciosa = new Pizza('Capricciosa', 1), 
-        $kecap = new Prilog('kecap', 1), 
-        $origano = new Prilog('origano', 1), 
-        $pastaItaliana = new Pasta('Pasta Italiana', 1), 
-        $kola = new GaziraniSok('kola', 2, 0.25)
-    ];
+    $porudzbina1 = new Porudzbina();
+    $porudzbina1->dodajObrok(new Pizza('Capricciosa', 1));
+    $porudzbina1->dodajObrok(new Pasta('Pasta Italiana', 2));
+    $porudzbina1->dodajObrok(new GaziraniSok('kola', 0.25, 1));
+    // var_dump($porudzbina1->obroci);
+    $porudzbina1->plati();
+    var_dump($porudzbina1);
 
-    $porudzbina2 = [
-        $pizzaSiciliana = new Pizza('Pizza Siciliana', 1), 
-        $pastaCarbonara = new Pasta('Pasta Carbonara', 1),
-        $sok = new NegaziraniSok('sok', 1, 0.25)
-    ];
+    // $racun = new Racun();
+    // $racun->izracunajCenu($porudzbina1);
 
-    $porudzbina3 = [
-        $pizzaCappriciosa = new Pizza('Pizza Capricciosa', 3), 
-        $kecap = new Prilog('kecap', 2), 
-        $gaziraniSok = new GaziraniSok('gazirani sok', 1, 0.3),
-        $negaziraniSok = new NegaziraniSok('negazirani sok', 1, 0.5),
-        $voda = new Voda('voda', 1, 'casa')
-    ];
-
-    // $mario->naruciObrok($porudzbina1);
-    // $mario->platiRacun(100);
 
 ?>  
 
