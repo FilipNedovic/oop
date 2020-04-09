@@ -104,7 +104,7 @@
         public function izracunajCenu(Array $porudzbina) {     
             $sum = 0;      
             for($i = 0; $i < count($porudzbina[0]); $i++) {
-                $sum += $porudzbina[0][$i]->cena;
+                $sum += $porudzbina[0][$i]->cena * $porudzbina[0][$i]->kolicina;
             }
 
             $this->iznos = $sum;
@@ -125,16 +125,18 @@
     abstract class Obrok {
         public $naziv; 
         public $cena;
+        public $kolicina;
 
-        public function __construct($naziv) {
+        public function __construct($naziv, $kolicina) {
             $this->naziv = $naziv;
+            $this->kolicina = $kolicina;
         }
 
     }
 
     class Hrana extends Obrok {
-        public function __construct($naziv) {
-            parent::__construct($naziv);
+        public function __construct($naziv, $kolicina) {
+            parent::__construct($naziv, $kolicina);
             $this->cena = rand(300, 600);
         }
     }
@@ -146,22 +148,22 @@
     class Pice extends Obrok {
         public $zapremina;
 
-        public function __construct($naziv, $zapremina) {
-            parent::__construct($naziv);
+        public function __construct($naziv, $kolicina, $zapremina) {
+            parent::__construct($naziv, $kolicina);
             $this->cena = rand(150, 500);
             $this->zapremina = $zapremina;
         }
     }
 
-    class GaziraniSokovi extends Pice {}
+    class GaziraniSok extends Pice {}
     
-    class NegaziraniSokovi extends Pice {}
+    class NegaziraniSok extends Pice {}
     
     class Voda extends Pice {}
 
     class Prilog extends Obrok {
-        public function __construct($naziv) {
-            parent::__construct($naziv);
+        public function __construct($naziv, $kolicina) {
+            parent::__construct($naziv, $kolicina);
             $this->cena = rand(20, 100);
         }
     }
@@ -172,33 +174,30 @@
     $mile = new Konobar('Mile', '0992873380001');
     $mario->dodajKonobara($mile);
 
-    $pizzMargherita = new Pizza('Margherita');
-    $pizzaCappriciosa = new Pizza('Capricciosa');
-    $pizzaQuattroStagioni = new Pizza('Quattro Stagioni');
-    $pizzaFungi = new Pizza('Fungi');
+    $porudzbina1 = [
+        $pizzaCappriciosa = new Pizza('Capricciosa', 1), 
+        $kecap = new Prilog('kecap', 1), 
+        $origano = new Prilog('origano', 1), 
+        $pastaItaliana = new Pasta('Pasta Italiana', 1), 
+        $kola = new GaziraniSok('kola', 2, 0.25)
+    ];
 
-    $pastaCarbonara = new Pasta('Pasta Carbonara');
-    $pastaItaliana = new Pasta('Pasta Italiana');
-    $pastaGricia = new Pasta('Pasta alla Gricia');
-    $pastaVesuviana = new Pasta('Pasta Vesuviana');
-    $pastaCipolla = new Pasta('Pasta alla Cipolla');
+    $porudzbina2 = [
+        $pizzaSiciliana = new Pizza('Pizza Siciliana', 1), 
+        $pastaCarbonara = new Pasta('Pasta Carbonara', 1),
+        $sok = new NegaziraniSok('sok', 1, 0.25)
+    ];
 
-    $kola = new GaziraniSokovi('Koka-Kola', '0.25');
-    $djus = new NegaziraniSokovi('djus', '0.3');
-    $voda = new Voda('voda', '0.25');
+    $porudzbina3 = [
+        $pizzaCappriciosa = new Pizza('Pizza Capricciosa', 3), 
+        $kecap = new Prilog('kecap', 2), 
+        $gaziraniSok = new GaziraniSok('gazirani sok', 1, 0.3),
+        $negaziraniSok = new NegaziraniSok('negazirani sok', 1, 0.5),
+        $voda = new Voda('voda', 1, 'casa')
+    ];
 
-    $origano = new Prilog('origano');
-    $kecap = new Prilog('kecap');
-    $sir = new Prilog('sir');
-
-    $mario->naruciObrok([$pizzaCappriciosa, $kola, $kecap]);
-    $mario->platiRacun(1500);
-    // var_dump($mario->stolovi);
-    // var_dump($mario);
-
-    // echo '<pre>';
-    //     var_dump();
-    // echo '</pre>';
+    // $mario->naruciObrok($porudzbina1);
+    // $mario->platiRacun(100);
 
 ?>  
 
