@@ -54,7 +54,18 @@
             $racun->izracunajCenu($porudzbinaZaNaplatu);
             
             // racun za naplatu
-            $racun->iznos;
+            return $racun->iznos;
+        }
+
+        function platiRacun(int $iznos) {
+            $racunZaNaplatu = $this->ispostaviRacun();
+
+            if($iznos < $racunZaNaplatu) {
+                echo 'Nemate dovoljno novca';
+            } else {
+                array_shift($this->neplacenePorudzbine);
+                echo 'Uspesno ste platili Vas racun';
+            }
         }
     }
 
@@ -180,11 +191,14 @@
     $kecap = new Prilog('kecap');
     $sir = new Prilog('sir');
 
-    // $mario->dodajPorudzbinu();
     $mario->naruciObrok([$pizzaCappriciosa, $kola, $kecap]);
-    $mario->ispostaviRacun();
+    $mario->platiRacun(1500);
     // var_dump($mario->stolovi);
     // var_dump($mario);
+
+    // echo '<pre>';
+    //     var_dump();
+    // echo '</pre>';
 
 ?>  
 
