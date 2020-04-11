@@ -74,12 +74,12 @@
     }
 
     class Porudzbina {
-        public $obroci = [];
+        public $obroci;
         public $obrok;
         public $placeno = false;
 
-        public function __construct(Obrok $obrok) {
-            $this->dodajObrok($obrok);
+        public function __construct(Array $obrok) {
+            $this->obroci = $obrok;
             Loger::logujKreiranjePorudzbine($this->obroci);
         }
 
@@ -147,8 +147,8 @@
     }
 
     class Loger {
-        public static function logujKreiranjePorudzbine($porudzbina) {
-            echo 'Porudzbina: datum ' . (new DateTime())->format('d.m.Y H:i') . ' ' . print_r($porudzbina) . '<br>';
+        public static function logujKreiranjePorudzbine(Array $porudzbina) {
+            echo 'Porudzbina: datum ' . (new DateTime())->format('d.m.Y H:i') . ' ' . '<pre>' . var_dump($porudzbina) . '</pre>';
         }
 
         public static function logujIzdavanjeRacuna($racun) {
@@ -162,7 +162,7 @@
     $mile = new Konobar('Mile', '0992873380001');
     $mario->dodajKonobara($mile);
 
-    $porudzbina1 = new Porudzbina(new Pizza('Capricciosa', 1), new Pasta('Pasta Italiana', 2), new GaziraniSok('kola', 0.25, 1));
+    $porudzbina1 = new Porudzbina([new Pizza('Capricciosa', 1), new Pasta('Pasta Italiana', 2), new GaziraniSok('kola', 0.25, 1)]);
 
     // $porudzbina1->dodajObrok(new Pizza('Capricciosa', 1));
     // $porudzbina1->dodajObrok(new Pasta('Pasta Italiana', 2));
