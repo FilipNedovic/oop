@@ -62,14 +62,14 @@
     class Racun {
         public $iznos;
 
-        public function izracunajCenu(Porudzbina $porudzbina) {     
+        public function izracunajCenu(Porudzbina $porudzbina) {               
             $sum = 0;      
             for($i = 0; $i < count($porudzbina->obroci); $i++) {
-                $sum += $porudzbina->obroci[$i]->cena * $porudzbina->obroci[$i]->kolicina;
-                // var_dump($porudzbina->obroci);
+                $sum += $porudzbina->obroci[$i]->ispostaviCenu();
             }
 
-            echo $this->iznos = $sum;
+            $this->iznos = $sum;
+            Loger::logujIzdavanjeRacuna($this->iznos);
         }
     }
 
@@ -82,7 +82,14 @@
             $this->obroci[] = $obrok;
         }
 
+        // public function getObroci() {
+        //     return $this->obroci;
+        // }
+
         public function plati() {
+            $racun = new Racun();
+            $racun->izracunajCenu($this);
+
             $this->placeno = true;
         }
 
@@ -98,9 +105,13 @@
             $this->kolicina = $kolicina;
         }
 
+        public function ispostaviCenu() {
+            return $this->cena * $this->kolicina;
+        }
+
     }
 
-    class Hrana extends Obrok {
+    class Hrana extends Obrok { 
         public function __construct($naziv, $kolicina) {
             parent::__construct($naziv, $kolicina);
             $this->cena = rand(300, 600);
@@ -134,6 +145,16 @@
         }
     }
 
+    class Loger {
+        public static function logujKreiranjePorudzbine($porudzbina) {
+            echo 'Porudzbina: datum ' . (new DateTime())->format('d.m.Y H:i') . ' ' . $porudzbina;
+        }
+
+        public static function logujIzdavanjeRacuna($racun) {
+            echo 'Racun: datum ' . (new DateTime())->format('d.m.Y H:i') . ' naplata ' . $racun;
+        }
+    }
+
 
     $mario = new Restoran('Mario\'s', 'Brace Krkljus 3');
 
@@ -141,15 +162,13 @@
     $mario->dodajKonobara($mile);
 
     $porudzbina1 = new Porudzbina();
+
     $porudzbina1->dodajObrok(new Pizza('Capricciosa', 1));
     $porudzbina1->dodajObrok(new Pasta('Pasta Italiana', 2));
     $porudzbina1->dodajObrok(new GaziraniSok('kola', 0.25, 1));
-    // var_dump($porudzbina1->obroci);
-    $porudzbina1->plati();
-    var_dump($porudzbina1);
 
-    // $racun = new Racun();
-    // $racun->izracunajCenu($porudzbina1);
+    $porudzbina1->plati();
+
 
 
 ?>  
