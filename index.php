@@ -147,12 +147,24 @@
     }
 
     class Loger {
+
+
         public static function logujKreiranjePorudzbine(Array $porudzbina) {
-            echo 'Porudzbina: datum ' . (new DateTime())->format('d.m.Y H:i') . ' ' . '<pre>' . var_dump($porudzbina) . '</pre>';
+            $string1 = 'Porudzbina: datum ' . (new DateTime())->format('d.m.Y H:i');
+            $string2 = self::formater($porudzbina);
+
+            echo $string1 . ' ' . $string2;
         }
+        
 
         public static function logujIzdavanjeRacuna($racun) {
             echo 'Racun: datum ' . (new DateTime())->format('d.m.Y H:i') . ' naplata ' . $racun;
+        }
+
+        public function formater($arr) {
+            foreach($arr as $value) {
+                echo $value->naziv .  ' ' . $value->kolicina . ' ' . $value->cena . ' | ';
+            }
         }
     }
 
